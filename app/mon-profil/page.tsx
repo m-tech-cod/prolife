@@ -252,7 +252,7 @@ export default function MonProfilPage() {
 
         {/* Message d'information */}
         <p className="text-xs text-center text-gray-400 mt-6">
-          Les informations en grisé ne peuvent pas être modifiées. Contactez l'administrateur pour toute modification.
+          Les informations en grisé ne peuvent pas être modifiées. Contactez l&apos;administrateur pour toute modification.
         </p>
       </main>
     </div>

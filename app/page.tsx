@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -72,7 +73,7 @@ export default function HomePage() {
         {/* Logo en haut à gauche */}
         <div className="absolute top-6 left-6 z-20 animate-slideInLeft">
           <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl hover:scale-105 transition-transform duration-300">
-            <img src="/images/logo.jpeg" alt="ProLife" className="w-12 h-12 object-contain rounded-full" />
+            <Image src="/images/logo.jpeg" alt="ProLife" width={64} height={64} className="rounded-full" />
           </div>
         </div>
 
@@ -154,7 +155,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer style={{ backgroundColor: "#005A23" }} className="text-white py-8 text-center">
         <p className="text-sm">© 2026 Communauté ProLife - Tous droits réservés</p>
-        <p className="text-xs mt-2 text-white/60">"Nous sommes pour la vie"</p>
+        <p className="text-xs mt-2 text-white/60">&quot;Nous sommes pour la vie&quot;</p>
       </footer>
 
       {/* Animations CSS */}
