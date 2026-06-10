@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -107,7 +108,7 @@ export default function AdhesionPage() {
       let photoUrl = null;
       if (photoFile) photoUrl = await uploadPhoto(authData.user.id);
 
-      const { data: member, error: memberError } = await supabase
+      const { data: member } = await supabase
         .from('members')
         .insert({
           user_id: authData.user.id,
@@ -157,9 +158,11 @@ export default function AdhesionPage() {
             <PartyPopper className="w-12 h-12 mx-auto mb-4" style={{ color: "#F2BE2E" }} />
             <CardTitle className="text-2xl mb-2" style={{ color: "#007A2F" }}>Demande envoyée !</CardTitle>
             <CardDescription className="mb-6">
-              Votre demande d'adhésion a été transmise.
+              Votre demande d&apos;adhésion a été transmise.
               <br />
-              <strong>Vous serez notifié par email après validation.</strong>
+              <strong>Vous serez notifié par email après validation de votre compte.</strong>
+              <br />
+              Une fois validé, vous pourrez vous connecter.
             </CardDescription>
           </CardContent>
         </Card>
@@ -172,17 +175,17 @@ export default function AdhesionPage() {
       <div className="text-white py-12 px-4 text-center" style={{ backgroundColor: "#007A2F" }}>
         <div className="max-w-2xl mx-auto">
           <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-            <img src="/images/logo.jpeg" alt="ProLife" className="w-12 h-12 object-contain rounded-full" />
+            <Image src="/images/logo.jpeg" alt="ProLife" width={48} height={48} className="rounded-full" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">Rejoignez notre communauté</h1>
-          <p className="text-white/90">"Nous ne sommes pas pour la mort, Nous sommes pour la vie."</p>
+          <p className="text-white/90">&quot;Nous ne sommes pas pour la mort, Nous sommes pour la vie.&quot;</p>
         </div>
       </div>
 
       <main className="container mx-auto px-4 py-10 max-w-3xl">
         <Card className="border-0 shadow-xl animate-fadeIn">
           <CardHeader className="text-center">
-            <CardTitle style={{ color: "#007A2F" }}>Formulaire d'adhésion</CardTitle>
+            <CardTitle style={{ color: "#007A2F" }}>Formulaire d&apos;adhésion</CardTitle>
             <CardDescription>Remplissez vos informations pour faire partie de ProLife</CardDescription>
           </CardHeader>
           <CardContent>
@@ -194,33 +197,21 @@ export default function AdhesionPage() {
                 <div className="relative">
                   <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-4 border-primary-green cursor-pointer hover:opacity-80 transition"
                     onClick={() => document.getElementById('photo-upload')?.click()}>
-                    {photoPreview ? <img src={photoPreview} alt="Photo" className="w-full h-full object-cover" /> : <Camera className="w-8 h-8 text-gray-400" />}
+                    {photoPreview ? <Image src={photoPreview} alt="Photo" width={96} height={96} className="object-cover" /> : <Camera className="w-8 h-8 text-gray-400" />}
                   </div>
                   <input id="photo-upload" type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" required />
                 </div>
                 {errors.photo && <ErrorMessage message={errors.photo} />}
               </div>
 
-              {/* Prénom */}
-              <div>
-                <Label>Prénom *</Label>
-                <Input required value={form.first_name} onChange={e => { setForm({...form, first_name: e.target.value}); setErrors({...errors, first_name: ""}); }} />
-                {errors.first_name && <ErrorMessage message={errors.first_name} />}
-              </div>
+              <div><Label>Prénom *</Label><Input required value={form.first_name} onChange={e => { setForm({...form, first_name: e.target.value}); setErrors({...errors, first_name: ""}); }} /></div>
+              {errors.first_name && <ErrorMessage message={errors.first_name} />}
 
-              {/* Nom */}
-              <div>
-                <Label>Nom *</Label>
-                <Input required value={form.last_name} onChange={e => { setForm({...form, last_name: e.target.value}); setErrors({...errors, last_name: ""}); }} />
-                {errors.last_name && <ErrorMessage message={errors.last_name} />}
-              </div>
+              <div><Label>Nom *</Label><Input required value={form.last_name} onChange={e => { setForm({...form, last_name: e.target.value}); setErrors({...errors, last_name: ""}); }} /></div>
+              {errors.last_name && <ErrorMessage message={errors.last_name} />}
 
-              {/* Email */}
-              <div>
-                <Label>Email *</Label>
-                <Input type="email" required value={form.email} onChange={e => { setForm({...form, email: e.target.value}); setErrors({...errors, email: ""}); }} />
-                {errors.email && <ErrorMessage message={errors.email} />}
-              </div>
+              <div><Label>Email *</Label><Input type="email" required value={form.email} onChange={e => { setForm({...form, email: e.target.value}); setErrors({...errors, email: ""}); }} /></div>
+              {errors.email && <ErrorMessage message={errors.email} />}
 
               {/* Mot de passe */}
               <div className="relative">
@@ -246,7 +237,6 @@ export default function AdhesionPage() {
                 {errors.confirmPassword && <ErrorMessage message={errors.confirmPassword} />}
               </div>
 
-              {/* Sexe, Date, Téléphone, Adresse, Profession (simplifiés) */}
               <div className="grid sm:grid-cols-2 gap-4">
                 <div><Label>Sexe</Label><select className="w-full border rounded-lg p-2" value={form.gender} onChange={e => setForm({...form, gender: e.target.value})}><option value="M">Homme</option><option value="F">Femme</option><option value="Autre">Autre</option></select></div>
                 <div><Label>Date de naissance</Label><Input type="date" value={form.birth_date} onChange={e => setForm({...form, birth_date: e.target.value})} /></div>
@@ -255,9 +245,18 @@ export default function AdhesionPage() {
                 <div><Label>Profession</Label><Input value={form.profession} onChange={e => setForm({...form, profession: e.target.value})} /></div>
               </div>
 
+              <div className="bg-amber-50 p-4 rounded-lg flex gap-3">
+                <Heart className="w-5 h-5 text-primary-red flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-gray-700">En rejoignant ProLife, vous vous engagez à respecter nos valeurs.</p>
+              </div>
+
               <Button type="submit" className="w-full font-semibold text-white" style={{ backgroundColor: "#007A2F" }} disabled={loading || uploading}>
                 {loading || uploading ? "Envoi en cours..." : "Envoyer ma demande"}
               </Button>
+
+              <p className="text-center text-sm text-gray-500">
+                Déjà membre ? <Link href="/auth/login" className="text-primary-green hover:underline">Se connecter</Link>
+              </p>
             </form>
           </CardContent>
         </Card>
