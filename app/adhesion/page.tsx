@@ -186,14 +186,14 @@ export default function AdhesionPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F8F9FA" }}>
-      <div className="fixed top-4 right-4 z-50">
+      <div className="fixed top-4 right-4 z-[9999]">
         <Link href="/">
-          <Button variant="outline" className="gap-2 bg-white/90 backdrop-blur-sm">
+          <Button variant="outline" className="gap-2 bg-white/90 backdrop-blur-sm shadow-lg">
             <Home className="w-4 h-4" /> Accueil
           </Button>
         </Link>
       </div>
-      
+
       {/* Bouton retour */}
       <div className="container mx-auto px-4 pt-6">
         <Link href="/" className="inline-flex items-center gap-2 text-primary-green hover:underline transition-colors duration-150">

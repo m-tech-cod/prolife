@@ -169,9 +169,9 @@ export default function MonProfilPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F8F9FA" }}>
       {/* Bouton retour accueil flottant */}
-      <div className="fixed top-4 right-4 z-50">
+      <div className="fixed top-4 right-4 z-[9999]">
         <Link href="/">
-          <Button variant="outline" className="gap-2 bg-white/90 backdrop-blur-sm">
+          <Button variant="outline" className="gap-2 bg-white/90 backdrop-blur-sm shadow-lg">
             <Home className="w-4 h-4" /> Accueil
           </Button>
         </Link>
