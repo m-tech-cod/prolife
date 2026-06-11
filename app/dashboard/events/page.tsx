@@ -79,7 +79,7 @@ export default function EventsPage() {
               </Button>
               <Link href="/dashboard/events/new">
                 <Link href="/dashboard/events/new" prefetch={true}>
-                  <Button className="gap-2 transition-colors duration-150" style={{ backgroundColor: "#007A2F" }}>
+                  <Button className="gap-2 transition-colors duration-150" style={{ backgroundColor: "#007A2F", color: "white" }}>
                     <Plus className="w-4 h-4" /> Nouvel événement
                   </Button>
                 </Link>

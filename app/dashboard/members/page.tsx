@@ -123,7 +123,7 @@ export default function MembersPage() {
               <h1 className="text-xl font-bold" style={{ color: "#007A2F" }}>Gestion des membres</h1>
             </div>
             <Link href="/dashboard/members/new" prefetch={true} className="w-full sm:w-auto">
-              <Button className="w-full sm:w-auto gap-2 transition-colors duration-150 cursor-pointer" style={{ backgroundColor: "#007A2F" }}>
+              <Button className="w-full sm:w-auto gap-2 transition-colors duration-150 cursor-pointer" style={{ backgroundColor: "#007A2F", color: "white" }}>
                 <Plus className="w-4 h-4" /> Nouveau membre
               </Button>
             </Link>
