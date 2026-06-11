@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Upload, Camera, ArrowLeft } from "lucide-react";
+import { Upload, Camera, ArrowLeft, AlertCircle } from "lucide-react";
 
 export default function NewMemberPage() {
   const [form, setForm] = useState({
@@ -23,6 +23,7 @@ export default function NewMemberPage() {
   });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -32,7 +33,14 @@ export default function NewMemberPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert("La photo ne doit pas dépasser 5 Mo");
+      return;
+    }
+
     setPhotoFile(file);
+    setPhotoError(false);
     const reader = new FileReader();
     reader.onloadend = () => {
       setPhotoPreview(reader.result as string);
@@ -68,11 +76,13 @@ export default function NewMemberPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     
     if (!photoFile) {
-      alert("Veuillez ajouter une photo");
+      setPhotoError(true);
+      setLoading(false);
       return;
-  }
+    }
 
     // Créer le membre
     const { data: member, error: memberError } = await supabase
@@ -123,52 +133,81 @@ export default function NewMemberPage() {
             <CardTitle>Informations personnelles</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Photo upload */}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Photo upload avec message d'erreur */}
               <div className="flex flex-col items-center mb-4">
                 <div className="relative">
                   <div 
-                    className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden border-4 border-primary-green cursor-pointer hover:opacity-80 transition"
+                    className={`w-24 h-24 rounded-full flex items-center justify-center overflow-hidden border-4 cursor-pointer hover:opacity-80 transition ${
+                      photoError ? "border-red-500 bg-red-50" : "border-primary-green bg-gray-200"
+                    }`}
                     onClick={() => document.getElementById('photo-upload')?.click()}
                   >
                     {photoPreview ? (
                       <img src={photoPreview} alt="Photo" className="w-full h-full object-cover" />
                     ) : (
-                      <Camera className="w-8 h-8 text-gray-400" />
+                      <Camera className={`w-8 h-8 ${photoError ? "text-red-400" : "text-gray-400"}`} />
                     )}
                   </div>
-                  <input
-                    id="photo-upload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoChange}
-                    className="hidden"
-                    required
-                  />
+                  <label className="absolute bottom-0 right-0 bg-primary-green p-1.5 rounded-full cursor-pointer hover:bg-dark-green transition">
+                    <Upload className="w-3 h-3 text-white" />
+                    <input
+                      id="photo-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoChange}
+                      className="hidden"
+                      required
+                    />
+                  </label>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Cliquez sur la caméra pour ajouter la photo du membre</p>
+                {photoError && (
+                  <div className="flex items-center gap-1 mt-2 text-red-500 text-xs">
+                    <AlertCircle className="w-3 h-3" />
+                    <span>Photo obligatoire</span>
+                  </div>
+                )}
+                <p className="text-xs text-gray-500 mt-1">Cliquez sur la caméra pour ajouter la photo du membre</p>
+                {uploading && <p className="text-xs text-primary-green mt-1">Upload en cours...</p>}
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div><Label>Prénom *</Label><Input required value={form.first_name} onChange={e => setForm({...form, first_name: e.target.value})} /></div>
-                <div><Label>Nom *</Label><Input required value={form.last_name} onChange={e => setForm({...form, last_name: e.target.value})} /></div>
-              </div>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div><Label>Sexe</Label>
-                  <select className="w-full border rounded-lg p-2" value={form.gender} onChange={e => setForm({...form, gender: e.target.value})}>
-                    <option value="M">Homme</option><option value="F">Femme</option><option value="Autre">Autre</option>
-                  </select>
+              <div className="space-y-4">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div><Label>Prénom *</Label><Input className="py-2 px-3" required value={form.first_name} onChange={e => setForm({...form, first_name: e.target.value})} /></div>
+                  <div><Label>Nom *</Label><Input className="py-2 px-3" required value={form.last_name} onChange={e => setForm({...form, last_name: e.target.value})} /></div>
                 </div>
-                <div><Label>Date de naissance</Label><Input type="date" value={form.birth_date} onChange={e => setForm({...form, birth_date: e.target.value})} /></div>
-              </div>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div><Label>Téléphone</Label><Input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></div>
-                <div><Label>Email</Label><Input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} /></div>
-              </div>
-              <div><Label>Adresse</Label><Input value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></div>
-              <div><Label>Profession</Label><Input value={form.profession} onChange={e => setForm({...form, profession: e.target.value})} /></div>
 
-              <Button type="submit" className="w-full transition-colors duration-150" style={{ backgroundColor: "#007A2F" }} disabled={loading || uploading}>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label>Sexe</Label>
+                    <select className="w-full border rounded-lg p-2 py-2 px-3" value={form.gender} onChange={e => setForm({...form, gender: e.target.value})}>
+                      <option value="M">Homme</option>
+                      <option value="F">Femme</option>
+                      <option value="Autre">Autre</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label>Date de naissance</Label>
+                    <Input 
+                      type="date" 
+                      max={new Date().toISOString().split('T')[0]}
+                      className="py-2 px-3"
+                      value={form.birth_date} 
+                      onChange={e => setForm({...form, birth_date: e.target.value})} 
+                    />
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div><Label>Téléphone</Label><Input className="py-2 px-3" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></div>
+                  <div><Label>Email</Label><Input className="py-2 px-3" type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} /></div>
+                </div>
+
+                <div><Label>Adresse</Label><Input className="py-2 px-3" value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></div>
+                <div><Label>Profession</Label><Input className="py-2 px-3" value={form.profession} onChange={e => setForm({...form, profession: e.target.value})} /></div>
+              </div>
+
+              <Button type="submit" className="w-full transition-colors duration-150 py-2" style={{ backgroundColor: "#007A2F", color: "white" }} disabled={loading || uploading}>
                 {loading || uploading ? "Création en cours..." : "Créer le membre"}
               </Button>
             </form>

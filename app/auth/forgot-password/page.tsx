@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { CheckCircle, ArrowLeft, Mail } from "lucide-react";
+import { CheckCircle, ArrowLeft, Mail, Home } from "lucide-react";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -35,6 +35,15 @@ export default function ForgotPasswordPage() {
   if (sent) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#F8F9FA" }}>
+        {/* Bouton retour accueil */}
+        <div className="fixed top-4 right-4 z-50">
+          <Link href="/">
+            <Button variant="outline" className="gap-2 bg-white/90 backdrop-blur-sm">
+              <Home className="w-4 h-4" /> Accueil
+            </Button>
+          </Link>
+        </div>
+
         <Card className="max-w-md w-full text-center border-0 shadow-xl">
           <CardContent className="pt-8">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -59,6 +68,15 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 overflow-x-hidden">
+      {/* Bouton retour accueil */}
+      <div className="fixed top-4 right-4 z-50">
+        <Link href="/">
+          <Button variant="outline" className="gap-2 bg-white/90 backdrop-blur-sm">
+            <Home className="w-4 h-4" /> Accueil
+          </Button>
+        </Link>
+      </div>
+
       {/* Côté gauche - Logo et Slogan avec dégradé animé */}
       <div 
         className="hidden lg:flex flex-col items-center justify-center p-8 text-white overflow-y-auto relative"
@@ -68,7 +86,6 @@ export default function ForgotPasswordPage() {
           animation: 'gradientShift 8s ease infinite'
         }}
       >
-        {/* Particules flottantes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {[...Array(15)].map((_, i) => (
             <div
@@ -127,7 +144,7 @@ export default function ForgotPasswordPage() {
                   placeholder="nom@exemple.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full border-gray-300 focus:border-[#007A2F] focus:ring-[#007A2F]"
+                  className="w-full border-gray-300 focus:border-[#007A2F] focus:ring-[#007A2F] py-2 px-3"
                   required
                 />
               </div>
@@ -135,7 +152,7 @@ export default function ForgotPasswordPage() {
             <CardFooter className="flex flex-col space-y-4">
               <Button 
                 type="submit" 
-                className="w-full font-semibold" 
+                className="w-full font-semibold py-2" 
                 style={{ backgroundColor: "#007A2F", color: "white" }}
                 disabled={loading}
               >
@@ -149,7 +166,6 @@ export default function ForgotPasswordPage() {
         </Card>
       </div>
 
-      {/* Animations CSS */}
       <style jsx>{`
         @keyframes gradientShift {
           0% { background-position: 0% 50%; }

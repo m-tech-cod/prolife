@@ -2,7 +2,7 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Email expéditeur - À modifier quand vous aurez votre domaine
+// Email expéditeur
 const FROM_EMAIL = process.env.FROM_EMAIL || 'onboarding@resend.dev';
 
 export async function sendEmail({
@@ -10,14 +10,14 @@ export async function sendEmail({
   subject,
   message,
 }: {
-  to: string;
+  to: string | string[];
   subject: string;
   message: string;
 }) {
   try {
     const { data, error } = await resend.emails.send({
       from: `ProLife <${FROM_EMAIL}>`,
-      to: [to],
+      to: Array.isArray(to) ? to : [to],
       subject: subject,
       text: message,
     });
@@ -34,15 +34,25 @@ export async function sendEmail({
   }
 }
 
-// Email quand une nouvelle adhésion est soumise (au secrétaire)
+// Email quand une nouvelle adhésion est soumise
 export async function notifyNewAdhesion(memberName: string, memberEmail: string) {
-  const secretaryEmail = process.env.SECRETARY_EMAIL || 'prolifevie@gmail.com';
+  // Liste des emails à notifier (codée en dur)
+  const notificationEmails = [
+    'prolifevie@gmail.com',
+    'jeannineaguemon@gmail.com'
+  ];
   
-  return sendEmail({
-    to: secretaryEmail,
-    subject: '📝 Nouvelle demande d\'adhésion ProLife',
-    message: `Bonjour,\n\nUne nouvelle demande d'adhésion a été soumise.\n\nNom: ${memberName}\nEmail: ${memberEmail}\n\nConnectez-vous à votre espace pour traiter cette demande.\n\nL'équipe ProLife`,
-  });
+  const results = await Promise.all(
+    notificationEmails.map(email => 
+      sendEmail({
+        to: email,
+        subject: '📝 Nouvelle demande d\'adhésion ProLife',
+        message: `Bonjour,\n\nUne nouvelle demande d'adhésion a été soumise.\n\nNom: ${memberName}\nEmail: ${memberEmail}\n\nConnectez-vous à votre espace pour traiter cette demande.\n\nL'équipe ProLife`,
+      })
+    )
+  );
+  
+  return results[0];
 }
 
 // Email quand l'adhésion est validée (au membre)

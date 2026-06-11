@@ -36,19 +36,23 @@ export default function AdhesionsPage() {
 
   const fetchAdhesions = async () => {
     setLoading(true);
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('adhesions')
       .select(`
         id,
         member_id,
         status,
         created_at,
-        members!inner(first_name, last_name, email, phone)
+        members:member_id(first_name, last_name, email, phone)
       `)
       .eq('status', 'en_attente')
       .order('created_at', { ascending: false });
 
-    setAdhesions(data || []);
+    if (error) {
+      console.error("Erreur fetch:", error);
+    } else {
+      setAdhesions(data || []);
+    }
     setLoading(false);
   };
 
@@ -56,21 +60,39 @@ export default function AdhesionsPage() {
     setSendingEmail(true);
     const status = action === 'valide' ? 'valide' : 'rejete';
     
-    await supabase
+    console.log("Tentative de", action, "pour ID:", id);
+    
+    // Mettre à jour l'adhésion
+    const { error: updateError } = await supabase
       .from('adhesions')
       .update({ status, reviewed_at: new Date().toISOString() })
       .eq('id', id);
 
+    if (updateError) {
+      console.error("Erreur update:", updateError);
+      alert("Erreur: " + updateError.message);
+      setSendingEmail(false);
+      return;
+    }
+
+    console.log("Update réussi pour", id);
+
     if (action === 'valide') {
-      await supabase
+      const { error: memberError } = await supabase
         .from('members')
         .update({ status: 'actif' })
         .eq('id', memberId);
+      
+      if (memberError) {
+        console.error("Erreur update membre:", memberError);
+      }
     }
 
     setSendingEmail(false);
-    fetchAdhesions();
+    await fetchAdhesions(); // Attendre le rafraîchissement
     setConfirmAction(null);
+    
+    alert(`Demande ${action === 'valide' ? 'validée' : 'rejetée'} avec succès !`);
   };
 
   useEffect(() => {
@@ -181,7 +203,7 @@ export default function AdhesionsPage() {
                 style={{ backgroundColor: confirmAction.action === 'valide' ? "#007A2F" : "#9F2723", color: "white" }}
                 disabled={sendingEmail}
               >
-                {sendingEmail ? "Envoi en cours..." : "Confirmer"}
+                {sendingEmail ? "Traitement..." : "Confirmer"}
               </Button>
             </div>
           </div>

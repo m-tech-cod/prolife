@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Home } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -38,6 +38,15 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 overflow-x-hidden">
+      {/* Bouton retour accueil - en haut à droite */}
+      <div className="fixed top-4 right-4 z-50">
+        <Link href="/">
+          <Button variant="outline" className="gap-2 bg-white/90 backdrop-blur-sm">
+            <Home className="w-4 h-4" /> Accueil
+          </Button>
+        </Link>
+      </div>
+
       {/* Côté gauche - Logo et Slogan AVEC DÉGRADÉ ANIMÉ */}
       <div 
         className="hidden lg:flex flex-col items-center justify-center p-8 text-white overflow-y-auto relative"
@@ -47,7 +56,6 @@ export default function LoginPage() {
           animation: 'gradientShift 8s ease infinite'
         }}
       >
-        {/* Effet de particules flottantes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ maxWidth: '100%' }}>
           {[...Array(12)].map((_, i) => (
             <div
@@ -65,7 +73,6 @@ export default function LoginPage() {
           ))}
         </div>
 
-        {/* Contenu - reste au même niveau vertical */}
         <div className="relative z-10 max-w-md text-center animate-slideInLeft">
           <div className="mb-8">
             <div className="w-32 h-32 mx-auto bg-white rounded-full flex items-center justify-center mb-6 shadow-xl">
@@ -83,7 +90,7 @@ export default function LoginPage() {
 
       {/* Côté droit - Formulaire */}
       <div className="flex items-center justify-center p-4 sm:p-8 lg:p-12 min-h-screen" style={{ backgroundColor: "#F8F9FA" }}>
-        <Card className="w-full max-w-md shadow-xl border-0 mx-4 sm:mx-0">
+        <Card className="w-full max-w-md shadow-xl border-0 mx-4 sm:mx-0 animate-slideInRight">
           <CardHeader className="space-y-1 text-center">
             <div className="lg:hidden flex justify-center mb-4">
               <div className="w-16 h-16 rounded-full flex items-center justify-center shadow-md" style={{ backgroundColor: "#007A2F" }}>
@@ -107,7 +114,7 @@ export default function LoginPage() {
                   placeholder="nom@exemple.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full border-gray-300 focus:border-[#007A2F] focus:ring-[#007A2F]"
+                  className="w-full border-gray-300 focus:border-[#007A2F] focus:ring-[#007A2F] py-2 px-3"
                   required
                 />
               </div>
@@ -119,7 +126,7 @@ export default function LoginPage() {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full border-gray-300 focus:border-[#007A2F] focus:ring-[#007A2F] pr-10"
+                    className="w-full border-gray-300 focus:border-[#007A2F] focus:ring-[#007A2F] pr-10 py-2 px-3"
                     required
                   />
                   <button
@@ -140,7 +147,7 @@ export default function LoginPage() {
             <CardFooter className="flex flex-col space-y-4">
               <Button 
                 type="submit" 
-                className="w-full font-semibold transition-colors duration-150 cursor-pointer" 
+                className="w-full font-semibold transition-colors duration-150 cursor-pointer py-2" 
                 style={{ backgroundColor: "#007A2F", color: "white" }}
                 disabled={loading}
               >
@@ -155,31 +162,27 @@ export default function LoginPage() {
         </Card>
       </div>
 
-      {/* Animations CSS */}
       <style jsx>{`
         @keyframes gradientShift {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
         }
-        
         @keyframes float {
           0% { transform: translateY(0px) translateX(0px); opacity: 0; }
           50% { opacity: 0.5; }
           100% { transform: translateY(-100px) translateX(20px); opacity: 0; }
         }
-        
-        .animate-float {
-          animation: float linear infinite;
-        }
-        
+        .animate-float { animation: float linear infinite; }
+        .animate-slideInLeft { animation: slideInLeft 0.6s ease-out forwards; }
+        .animate-slideInRight { animation: slideInRight 0.6s ease-out forwards; }
         @keyframes slideInLeft {
           from { opacity: 0; transform: translateX(-50px); }
           to { opacity: 1; transform: translateX(0); }
         }
-        
-        .animate-slideInLeft {
-          animation: slideInLeft 0.6s ease-out forwards;
+        @keyframes slideInRight {
+          from { opacity: 0; transform: translateX(50px); }
+          to { opacity: 1; transform: translateX(0); }
         }
       `}</style>
     </div>
