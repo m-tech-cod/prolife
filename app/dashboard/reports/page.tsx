@@ -6,10 +6,26 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, FileSpreadsheet, Download, Users, Archive, UserPlus } from "lucide-react";
 import Link from "next/link";
+import { exportToPDF, exportToExcel } from "@/lib/utils/exports";
+
+interface Member {
+  id: string;
+  member_number: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  gender: string;
+  birth_date: string;
+  address: string;
+  profession: string;
+  admission_date: string;
+  status: string;
+}
 
 export default function ReportsPage() {
-  const [activeMembers, setActiveMembers] = useState<any[]>([]);
-  const [archivedMembers, setArchivedMembers] = useState<any[]>([]);
+  const [activeMembers, setActiveMembers] = useState<Member[]>([]);
+  const [archivedMembers, setArchivedMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
@@ -26,28 +42,14 @@ export default function ReportsPage() {
       .select('*')
       .eq('is_archived', true);
     
-    setActiveMembers(active || []);
-    setArchivedMembers(archived || []);
+    setActiveMembers((active as Member[]) || []);
+    setArchivedMembers((archived as Member[]) || []);
     setLoading(false);
-  };
-
-  const exportToPDF = async (members: any[], title: string) => {
-    alert(`Export PDF de ${title} (${members.length} membres) - Fonctionnalité à venir`);
-  };
-
-  const exportToExcel = async (members: any[], title: string) => {
-    alert(`Export Excel de ${title} (${members.length} membres) - Fonctionnalité à venir`);
   };
 
   useEffect(() => {
     fetchData();
   }, []);
-
-  const reportCards = [
-    { title: "Membres actifs", count: activeMembers.length, icon: Users, color: "#007A2F", members: activeMembers },
-    { title: "Membres archivés", count: archivedMembers.length, icon: Archive, color: "#9F2723", members: archivedMembers },
-    { title: "Total adhésions", count: activeMembers.length + archivedMembers.length, icon: UserPlus, color: "#F2BE2E", members: [...activeMembers, ...archivedMembers] },
-  ];
 
   if (loading) {
     return (
@@ -56,6 +58,8 @@ export default function ReportsPage() {
       </div>
     );
   }
+
+  const allMembers = [...activeMembers, ...archivedMembers];
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F8F9FA" }}>
@@ -72,37 +76,71 @@ export default function ReportsPage() {
 
       <main className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {reportCards.map((card, i) => (
-            <Card key={i} className="border-0 shadow-md hover:shadow-lg transition-shadow duration-150">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center justify-between">
-                  <span style={{ color: card.color }}>{card.title}</span>
-                  <card.icon className="w-6 h-6" style={{ color: card.color }} />
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold mb-4" style={{ color: card.color }}>{card.count}</p>
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={() => exportToPDF(card.members, card.title)}
-                    className="flex-1 gap-2 transition-colors duration-150 cursor-pointer"
-                    style={{ backgroundColor: card.color, color: "white" }}
-                  >
-                    <FileText className="w-4 h-4" /> PDF
-                  </Button>
-                  <Button 
-                    onClick={() => exportToExcel(card.members, card.title)}
-                    variant="outline"
-                    className="flex-1 gap-2 transition-colors duration-150 cursor-pointer"
-                  >
-                    <FileSpreadsheet className="w-4 h-4" /> Excel
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          {/* Carte Membres actifs */}
+          <Card className="border-0 shadow-md hover:shadow-lg transition-shadow duration-150">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center justify-between">
+                <span style={{ color: "#007A2F" }}>Membres actifs</span>
+                <Users className="w-6 h-6" style={{ color: "#007A2F" }} />
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold mb-4" style={{ color: "#007A2F" }}>{activeMembers.length}</p>
+              <div className="flex gap-2">
+                <Button onClick={() => exportToPDF(activeMembers, "Membres_actifs")} className="flex-1 gap-2" style={{ backgroundColor: "#007A2F", color: "white" }}>
+                  <FileText className="w-4 h-4" /> PDF
+                </Button>
+                <Button onClick={() => exportToExcel(activeMembers, "Membres_actifs")} variant="outline" className="flex-1 gap-2">
+                  <FileSpreadsheet className="w-4 h-4" /> Excel
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Carte Membres archivés */}
+          <Card className="border-0 shadow-md hover:shadow-lg transition-shadow duration-150">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center justify-between">
+                <span style={{ color: "#9F2723" }}>Membres archivés</span>
+                <Archive className="w-6 h-6" style={{ color: "#9F2723" }} />
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold mb-4" style={{ color: "#9F2723" }}>{archivedMembers.length}</p>
+              <div className="flex gap-2">
+                <Button onClick={() => exportToPDF(archivedMembers, "Membres_archives")} className="flex-1 gap-2" style={{ backgroundColor: "#9F2723", color: "white" }}>
+                  <FileText className="w-4 h-4" /> PDF
+                </Button>
+                <Button onClick={() => exportToExcel(archivedMembers, "Membres_archives")} variant="outline" className="flex-1 gap-2">
+                  <FileSpreadsheet className="w-4 h-4" /> Excel
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Carte Total adhésions */}
+          <Card className="border-0 shadow-md hover:shadow-lg transition-shadow duration-150">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center justify-between">
+                <span style={{ color: "#F2BE2E" }}>Total adhésions</span>
+                <UserPlus className="w-6 h-6" style={{ color: "#F2BE2E" }} />
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold mb-4" style={{ color: "#F2BE2E" }}>{allMembers.length}</p>
+              <div className="flex gap-2">
+                <Button onClick={() => exportToPDF(allMembers, "Total_adhésions")} className="flex-1 gap-2" style={{ backgroundColor: "#F2BE2E", color: "#005A23" }}>
+                  <FileText className="w-4 h-4" /> PDF
+                </Button>
+                <Button onClick={() => exportToExcel(allMembers, "Total_adhésions")} variant="outline" className="flex-1 gap-2">
+                  <FileSpreadsheet className="w-4 h-4" /> Excel
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
+        {/* Export complet */}
         <Card className="border-0 shadow-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -112,18 +150,10 @@ export default function ReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                onClick={() => exportToPDF([...activeMembers, ...archivedMembers], "Tous_les_membres")}
-                className="flex-1 gap-2 transition-colors duration-150 cursor-pointer"
-                style={{ backgroundColor: "#007A2F", color: "white" }}
-              >
+              <Button onClick={() => exportToPDF(allMembers, "Tous_les_membres")} className="flex-1 gap-2" style={{ backgroundColor: "#007A2F", color: "white" }}>
                 <FileText className="w-4 h-4" /> Exporter tout en PDF
               </Button>
-              <Button 
-                onClick={() => exportToExcel([...activeMembers, ...archivedMembers], "Tous_les_membres")}
-                variant="outline"
-                className="flex-1 gap-2 transition-colors duration-150 cursor-pointer"
-              >
+              <Button onClick={() => exportToExcel(allMembers, "Tous_les_membres")} variant="outline" className="flex-1 gap-2">
                 <FileSpreadsheet className="w-4 h-4" /> Exporter tout en Excel
               </Button>
             </div>

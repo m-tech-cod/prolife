@@ -17,7 +17,6 @@ interface Member {
   status: string;
 }
 
-// Export PDF
 export const exportToPDF = (members: Member[], title: string) => {
   const doc = new jsPDF();
   
@@ -26,6 +25,7 @@ export const exportToPDF = (members: Member[], title: string) => {
   doc.setTextColor(0, 122, 47);
   doc.text(title, 14, 22);
   
+  // Date
   doc.setFontSize(10);
   doc.setTextColor(100, 100, 100);
   doc.text(`Généré le : ${new Date().toLocaleDateString('fr-FR')}`, 14, 32);
@@ -53,7 +53,6 @@ export const exportToPDF = (members: Member[], title: string) => {
   doc.save(`prolife_${title.toLowerCase().replace(/ /g, '_')}.pdf`);
 };
 
-// Export Excel
 export const exportToExcel = (members: Member[], title: string) => {
   const data = members.map(member => ({
     'N° membre': member.member_number,

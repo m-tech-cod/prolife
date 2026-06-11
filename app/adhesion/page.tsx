@@ -75,25 +75,39 @@ export default function AdhesionPage() {
   };
 
   const uploadPhoto = async (userId: string): Promise<string | null> => {
-    if (!photoFile) return null;
-    setUploading(true);
-    const fileExt = photoFile.name.split('.').pop();
-    const fileName = `${userId}-${Date.now()}.${fileExt}`;
-    const filePath = `profiles/${fileName}`;
-    const supabase = createClient();
+  if (!photoFile) return null;
+  
+  setUploading(true);
+  console.log("1. Début upload pour userId:", userId);
+  
+  const fileExt = photoFile.name.split('.').pop();
+  const fileName = `${userId}-${Date.now()}.${fileExt}`;
+  const filePath = `profiles/${fileName}`;
+  const supabase = createClient();
 
-    const { error } = await supabase.storage.from('member-photos').upload(filePath, photoFile);
-    setUploading(false);
+  console.log("2. Upload vers:", filePath);
+  
+  const { error } = await supabase.storage
+    .from('member-photos')
+    .upload(filePath, photoFile);
 
-    if (error) {
-      console.error("Erreur upload:", error);
-      toast.error("Erreur lors de l'upload de la photo");
-      return null;
-    }
+  setUploading(false);
 
-    const { data: { publicUrl } } = supabase.storage.from('member-photos').getPublicUrl(filePath);
-    return publicUrl;
-  };
+  if (error) {
+    console.error("3. Erreur upload COMPLETE:", error);
+    toast.error("Erreur upload: " + error.message);
+    return null;
+  }
+
+  console.log("3. Upload réussi");
+  
+  const { data: { publicUrl } } = supabase.storage
+    .from('member-photos')
+    .getPublicUrl(filePath);
+
+  console.log("4. URL publique:", publicUrl);
+  return publicUrl;
+};
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -182,7 +196,7 @@ export default function AdhesionPage() {
               <strong>Vous serez notifié par email après validation.</strong>
             </CardDescription>
             <Link href="/">
-              <Button className="mt-4" style={{ backgroundColor: "#007A2F" }}>Retour à l&apos;accueil</Button>
+              <Button className="mt-4" style={{ backgroundColor: "#007A2F", color: "white" }}>Retour à l&apos;accueil</Button>
             </Link>
           </CardContent>
         </Card>

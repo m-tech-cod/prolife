@@ -184,7 +184,7 @@ export default function EditMemberPage() {
               <div><Label>Adresse</Label><Input value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></div>
               <div><Label>Profession</Label><Input value={form.profession} onChange={e => setForm({...form, profession: e.target.value})} /></div>
               
-              <Button type="submit" className="w-full" style={{ backgroundColor: "#007A2F" }} disabled={loading || uploading}>
+              <Button type="submit" className="w-full" style={{ backgroundColor: "#007A2F", color: "white" }} disabled={loading || uploading}>
                 {loading ? "Enregistrement..." : "Enregistrer les modifications"}
               </Button>
             </form>
