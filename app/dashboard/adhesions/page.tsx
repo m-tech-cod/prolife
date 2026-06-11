@@ -4,26 +4,14 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, XCircle, RefreshCw, AlertTriangle, Mail } from "lucide-react";
+import { CheckCircle, XCircle, RefreshCw, AlertTriangle } from "lucide-react";
 import Link from "next/link";
-
-interface Adhesion {
-  id: string;
-  member_id: string;
-  status: string;
-  created_at: string;
-  members: {
-    first_name: string;
-    last_name: string;
-    email: string;
-    phone: string;
-  };
-}
+import toast, { Toaster } from "react-hot-toast";
+import { notifyAdhesionValidated, notifyAdhesionRejected } from "@/lib/email";
 
 export default function AdhesionsPage() {
   const [adhesions, setAdhesions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sendingEmail, setSendingEmail] = useState(false);
   const [confirmAction, setConfirmAction] = useState<{ 
     id: string; 
     memberId: string; 
@@ -57,10 +45,7 @@ export default function AdhesionsPage() {
   };
 
   const handleAction = async (id: string, memberId: string, action: 'valide' | 'rejete', email: string, name: string) => {
-    setSendingEmail(true);
     const status = action === 'valide' ? 'valide' : 'rejete';
-    
-    console.log("Tentative de", action, "pour ID:", id);
     
     // Mettre à jour l'adhésion
     const { error: updateError } = await supabase
@@ -69,30 +54,27 @@ export default function AdhesionsPage() {
       .eq('id', id);
 
     if (updateError) {
-      console.error("Erreur update:", updateError);
-      alert("Erreur: " + updateError.message);
-      setSendingEmail(false);
+      toast.error("Erreur: " + updateError.message);
       return;
     }
 
-    console.log("Update réussi pour", id);
-
     if (action === 'valide') {
-      const { error: memberError } = await supabase
+      await supabase
         .from('members')
         .update({ status: 'actif' })
         .eq('id', memberId);
       
-      if (memberError) {
-        console.error("Erreur update membre:", memberError);
-      }
+      // Envoyer email au membre
+      await notifyAdhesionValidated(email, name);
+      toast.success(`Adhésion de ${name} validée !`);
+    } else {
+      // Envoyer email au membre
+      await notifyAdhesionRejected(email, name);
+      toast.success(`Adhésion de ${name} rejetée.`);
     }
 
-    setSendingEmail(false);
-    await fetchAdhesions(); // Attendre le rafraîchissement
+    await fetchAdhesions();
     setConfirmAction(null);
-    
-    alert(`Demande ${action === 'valide' ? 'validée' : 'rejetée'} avec succès !`);
   };
 
   useEffect(() => {
@@ -101,6 +83,8 @@ export default function AdhesionsPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F8F9FA" }}>
+      <Toaster position="top-right" />
+      
       <header className="bg-white shadow-sm border-b sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between flex-wrap gap-4">
@@ -129,7 +113,7 @@ export default function AdhesionsPage() {
               </div>
             ) : (
               <div className="divide-y">
-                {adhesions.map((item, i) => (
+                {adhesions.map((item) => (
                   <div key={item.id} className="p-4 sm:p-6 hover:bg-gray-50 transition-colors duration-150">
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                       <div className="flex-1">
@@ -190,8 +174,8 @@ export default function AdhesionsPage() {
             </h3>
             <p className="text-gray-500 mb-4">
               {confirmAction.action === 'valide' 
-                ? "Cette action va activer le compte du membre."
-                : "Cette action va refuser la demande."}
+                ? "Le membre recevra un email de confirmation."
+                : "Le membre recevra un email de refus."}
             </p>
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setConfirmAction(null)} className="flex-1">
@@ -201,9 +185,8 @@ export default function AdhesionsPage() {
                 onClick={() => handleAction(confirmAction.id, confirmAction.memberId, confirmAction.action, confirmAction.email, confirmAction.name)}
                 className="flex-1"
                 style={{ backgroundColor: confirmAction.action === 'valide' ? "#007A2F" : "#9F2723", color: "white" }}
-                disabled={sendingEmail}
               >
-                {sendingEmail ? "Traitement..." : "Confirmer"}
+                Confirmer
               </Button>
             </div>
           </div>

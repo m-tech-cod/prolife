@@ -1,6 +1,5 @@
 "use client";
 
-import { Home } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
@@ -10,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, Heart, PartyPopper, Upload, Camera, Eye, EyeOff, ArrowLeft, AlertCircle } from "lucide-react";
 import Link from "next/link";
-import ErrorMessage from "@/components/shared/ErrorMessage";
+import toast, { Toaster } from "react-hot-toast";
+import { notifyNewAdhesion } from "@/lib/email";
 
 export default function AdhesionPage() {
   const [loading, setLoading] = useState(false);
@@ -62,14 +62,13 @@ export default function AdhesionPage() {
 
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      setErrors({ ...errors, photo: "La photo ne doit pas dépasser 5 Mo" });
+      toast.error("La photo ne doit pas dépasser 5 Mo");
       setPhotoError(true);
       return;
     }
 
     setPhotoFile(file);
     setPhotoError(false);
-    setErrors({ ...errors, photo: "" });
     const reader = new FileReader();
     reader.onloadend = () => setPhotoPreview(reader.result as string);
     reader.readAsDataURL(file);
@@ -88,6 +87,7 @@ export default function AdhesionPage() {
 
     if (error) {
       console.error("Erreur upload:", error);
+      toast.error("Erreur lors de l'upload de la photo");
       return null;
     }
 
@@ -108,7 +108,7 @@ export default function AdhesionPage() {
     });
 
     if (authError) {
-      setErrors({ form: authError.message });
+      toast.error("Erreur: " + authError.message);
       setLoading(false);
       return;
     }
@@ -117,7 +117,7 @@ export default function AdhesionPage() {
       let photoUrl = null;
       if (photoFile) photoUrl = await uploadPhoto(authData.user.id);
 
-      const { data: member } = await supabase
+      const { data: member, error: memberError } = await supabase
         .from('members')
         .insert({
           user_id: authData.user.id,
@@ -136,6 +136,12 @@ export default function AdhesionPage() {
         .select()
         .single();
 
+      if (memberError) {
+        toast.error("Erreur création membre");
+        setLoading(false);
+        return;
+      }
+
       if (member) {
         await supabase.from('adhesions').insert({
           member_id: member.id,
@@ -150,6 +156,9 @@ export default function AdhesionPage() {
         role: 'membre',
         is_active: false,
       });
+
+      // Envoyer email de notification aux admins
+      await notifyNewAdhesion(`${form.first_name} ${form.last_name}`, form.email);
     }
 
     setLoading(false);
@@ -159,6 +168,7 @@ export default function AdhesionPage() {
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#F8F9FA" }}>
+        <Toaster position="top-right" />
         <Card className="max-w-md w-full text-center border-0 shadow-xl animate-bounceIn">
           <CardContent className="pt-8">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -169,14 +179,10 @@ export default function AdhesionPage() {
             <CardDescription className="mb-6">
               Votre demande d&apos;adhésion a été transmise.
               <br />
-              <strong>Vous serez notifié par email après validation de votre compte.</strong>
-              <br />
-              Une fois validé, vous pourrez vous connecter.
+              <strong>Vous serez notifié par email après validation.</strong>
             </CardDescription>
             <Link href="/">
-              <Button className="mt-4" style={{ backgroundColor: "#007A2F" }}>
-                Retour à l&apos;accueil
-              </Button>
+              <Button className="mt-4" style={{ backgroundColor: "#007A2F" }}>Retour à l&apos;accueil</Button>
             </Link>
           </CardContent>
         </Card>
@@ -186,18 +192,13 @@ export default function AdhesionPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F8F9FA" }}>
+      <Toaster position="top-right" />
+      
       <div className="fixed top-4 right-4 z-[9999]">
         <Link href="/">
           <Button variant="outline" className="gap-2 bg-white/90 backdrop-blur-sm shadow-lg">
-            <Home className="w-4 h-4" /> Accueil
+            <ArrowLeft className="w-4 h-4" /> Accueil
           </Button>
-        </Link>
-      </div>
-
-      {/* Bouton retour */}
-      <div className="container mx-auto px-4 pt-6">
-        <Link href="/" className="inline-flex items-center gap-2 text-primary-green hover:underline transition-colors duration-150">
-          <ArrowLeft className="w-4 h-4" /> Retour à l&apos;accueil
         </Link>
       </div>
 
@@ -207,7 +208,7 @@ export default function AdhesionPage() {
             <Image src="/images/logo.jpeg" alt="ProLife" width={48} height={48} className="rounded-full" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">Rejoignez notre communauté</h1>
-          <p className="text-white/90">&quot;Nous ne sommes pas pour la mort, Nous sommes pour la vie.&quot;</p>
+          <p className="text-white/90">&quot;Nous sommes pour la vie.&quot;</p>
         </div>
       </div>
 
@@ -219,9 +220,7 @@ export default function AdhesionPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSignup} className="space-y-6">
-              {errors.form && <ErrorMessage message={errors.form} onClose={() => setErrors({ ...errors, form: "" })} />}
-
-              {/* Photo avec message d'erreur */}
+              {/* Photo */}
               <div className="flex flex-col items-center mb-4">
                 <div className="relative">
                   <div 
@@ -244,7 +243,6 @@ export default function AdhesionPage() {
                       accept="image/*"
                       onChange={handlePhotoChange}
                       className="hidden"
-                      required
                     />
                   </label>
                 </div>
@@ -260,13 +258,13 @@ export default function AdhesionPage() {
 
               <div className="space-y-4">
                 <div><Label>Prénom *</Label><Input className="py-2 px-3" required value={form.first_name} onChange={e => { setForm({...form, first_name: e.target.value}); setErrors({...errors, first_name: ""}); }} /></div>
-                {errors.first_name && <ErrorMessage message={errors.first_name} />}
+                {errors.first_name && <p className="text-red-500 text-xs">{errors.first_name}</p>}
 
                 <div><Label>Nom *</Label><Input className="py-2 px-3" required value={form.last_name} onChange={e => { setForm({...form, last_name: e.target.value}); setErrors({...errors, last_name: ""}); }} /></div>
-                {errors.last_name && <ErrorMessage message={errors.last_name} />}
+                {errors.last_name && <p className="text-red-500 text-xs">{errors.last_name}</p>}
 
                 <div><Label>Email *</Label><Input className="py-2 px-3" type="email" required value={form.email} onChange={e => { setForm({...form, email: e.target.value}); setErrors({...errors, email: ""}); }} /></div>
-                {errors.email && <ErrorMessage message={errors.email} />}
+                {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
 
                 <div>
                   <Label>Mot de passe *</Label>
@@ -276,7 +274,7 @@ export default function AdhesionPage() {
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
-                  {errors.password && <ErrorMessage message={errors.password} />}
+                  {errors.password && <p className="text-red-500 text-xs">{errors.password}</p>}
                 </div>
 
                 <div>
@@ -287,41 +285,22 @@ export default function AdhesionPage() {
                       {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
-                  {errors.confirmPassword && <ErrorMessage message={errors.confirmPassword} />}
+                  {errors.confirmPassword && <p className="text-red-500 text-xs">{errors.confirmPassword}</p>}
                 </div>
               </div>
 
               <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <Label>Sexe</Label>
+                <div><Label>Sexe</Label>
                   <select className="w-full border rounded-lg p-2 py-2" value={form.gender} onChange={e => setForm({...form, gender: e.target.value})}>
-                    <option value="M">Homme</option>
-                    <option value="F">Femme</option>
-                    <option value="Autre">Autre</option>
+                    <option value="M">Homme</option><option value="F">Femme</option><option value="Autre">Autre</option>
                   </select>
                 </div>
-                <div>
-                  <Label>Date de naissance</Label>
-                  <Input 
-                    type="date" 
-                    max={new Date().toISOString().split('T')[0]}
-                    className="py-2 px-3"
-                    value={form.birth_date} 
-                    onChange={e => setForm({...form, birth_date: e.target.value})} 
-                  />
+                <div><Label>Date de naissance</Label>
+                  <Input type="date" max={new Date().toISOString().split('T')[0]} className="py-2 px-3" value={form.birth_date} onChange={e => setForm({...form, birth_date: e.target.value})} />
                 </div>
-                <div>
-                  <Label>Téléphone</Label>
-                  <Input className="py-2 px-3" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
-                </div>
-                <div>
-                  <Label>Adresse</Label>
-                  <Input className="py-2 px-3" value={form.address} onChange={e => setForm({...form, address: e.target.value})} />
-                </div>
-                <div>
-                  <Label>Profession</Label>
-                  <Input className="py-2 px-3" value={form.profession} onChange={e => setForm({...form, profession: e.target.value})} />
-                </div>
+                <div><Label>Téléphone</Label><Input className="py-2 px-3" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} /></div>
+                <div><Label>Adresse</Label><Input className="py-2 px-3" value={form.address} onChange={e => setForm({...form, address: e.target.value})} /></div>
+                <div><Label>Profession</Label><Input className="py-2 px-3" value={form.profession} onChange={e => setForm({...form, profession: e.target.value})} /></div>
               </div>
 
               <div className="bg-amber-50 p-4 rounded-lg flex gap-3">
