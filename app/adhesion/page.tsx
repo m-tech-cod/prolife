@@ -161,11 +161,19 @@ export default function AdhesionPage() {
       }
 
       if (member) {
-        await supabase.from('adhesions').insert({
-          member_id: member.id,
-          status: 'en_attente',
-          created_at: new Date().toISOString(),
-        });
+        const { error: adhesionError } = await supabase
+          .from('adhesions')
+          .insert({
+            member_id: member.id,
+            status: 'en_attente',
+            created_at: new Date().toISOString(),
+          });
+
+        console.log("adhesionError:", adhesionError);
+
+        if (adhesionError) {
+          console.error("Erreur insertion adhesion:", adhesionError);
+        }
       }
 
       await supabase.from('users_metadata').insert({
