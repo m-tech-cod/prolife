@@ -150,7 +150,11 @@ export default function AdhesionPage() {
         .select()
         .single();
 
+        console.log("memberError:", memberError);  // ← AJOUTER ICI
+        console.log("member:", member);            // ← AJOUTER ICI
+
       if (memberError) {
+        console.error("Détail erreur membre:", memberError);  // ← AJOUTER ICI
         toast.error("Erreur création membre");
         setLoading(false);
         return;
