@@ -19,22 +19,6 @@ Plateforme web de gestion des membres pour la communauté ProLife.
 - Tableau de bord avec statistiques
 - Notifications par email
 
-## Installation
-
-```bash
-# Cloner le projet
-git clone https://github.com/m-tech-cod/prolife
-cd prolife
-
-# Installer les dépendances
-npm install
-
-# Configurer les variables d'environnement
-cp .env.example .env.local
-
-# Lancer en développement
-npm run dev
-
 ## Variables d'environnement
 
 NEXT_PUBLIC_SUPABASE_URL=https://nnjhbqvvepwkuksrdqgx.supabase.co
