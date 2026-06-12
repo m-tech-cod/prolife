@@ -30,19 +30,18 @@ export async function sendEmail({
   }
 }
 
+// VOTRE EMAIL POUR RECEVOIR LES NOTIFICATIONS
+const MON_EMAIL = 'malomonaraffath@gmail.com';
+
 export async function notifyNewAdhesion(memberName: string, memberEmail: string) {
-  const notificationEmails = ['prolifevie@gmail.com', 'jeannineaguemon@gmail.com'];
+  // Envoi à votre email uniquement (pour que ça fonctionne avec Resend)
+  const result = await sendEmail({
+    to: MON_EMAIL,
+    subject: '📝 Nouvelle demande d\'adhésion ProLife',
+    message: `Bonjour,\n\nUne nouvelle demande d'adhésion a été soumise.\n\nNom: ${memberName}\nEmail: ${memberEmail}\n\nConnectez-vous pour traiter cette demande.\n\nL'équipe ProLife`,
+  });
   
-  const results = await Promise.all(
-    notificationEmails.map(email => 
-      sendEmail({
-        to: email,
-        subject: '📝 Nouvelle demande d\'adhésion ProLife',
-        message: `Bonjour,\n\nUne nouvelle demande d'adhésion a été soumise.\n\nNom: ${memberName}\nEmail: ${memberEmail}\n\nConnectez-vous pour traiter cette demande.\n\nL'équipe ProLife`,
-      })
-    )
-  );
-  return results[0];
+  return result;
 }
 
 export async function notifyAdhesionValidated(email: string, name: string) {
