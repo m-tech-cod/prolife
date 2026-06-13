@@ -1,4 +1,4 @@
-# ProLife Community
+# Communauté ProLife
 
 Plateforme web de gestion des membres pour la communauté ProLife.
 
@@ -18,19 +18,6 @@ Plateforme web de gestion des membres pour la communauté ProLife.
 - Exports PDF et Excel
 - Tableau de bord avec statistiques
 - Notifications par email
-
-## Variables d'environnement
-
-NEXT_PUBLIC_SUPABASE_URL=https://nnjhbqvvepwkuksrdqgx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_2OjqHR545V_a3i1bbzUEow_CUVMGgk4
-
-RESEND_API_KEY=re_XazU9opA_9iPyZnxFnBykeSCYseAaxTaj
-NEXT_PUBLIC_APP_URL=http://communaute-prolife.vercel.app
-
-##  Build
-
-npm run build
-npm start
 
 ##  Rôles
 
@@ -52,4 +39,4 @@ Rouge : #9F2723
 Jaune : #F2BE2E
 
 ## Licence
-© 2024 Communauté ProLife  - Tous droits réservés
+© 2026 Communauté ProLife  - Tous droits réservés
