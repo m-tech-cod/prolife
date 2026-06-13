@@ -20,8 +20,11 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     setLoading(true);
     
+    // Utiliser l'URL du navigateur au lieu de la variable d'environnement
+    const appUrl = typeof window !== 'undefined' ? window.location.origin : 'https://communaute-prolife.vercel.app';
+    
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+      redirectTo: `${appUrl}/auth/callback`,
     });
 
     setLoading(false);
