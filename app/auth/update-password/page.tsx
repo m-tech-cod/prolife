@@ -1,5 +1,6 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -18,17 +19,27 @@ export default function UpdatePasswordPage() {
     e.preventDefault();
     setLoading(true);
 
+    // Récupérer la session actuelle
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError || !session) {
+        alert("Session expirée. Veuillez refaire une demande.");
+        router.push("/auth/forgot-password");
+        setLoading(false);
+        return;
+    }
+
     const { error } = await supabase.auth.updateUser({ password });
 
     setLoading(false);
 
     if (error) {
-      alert("Erreur: " + error.message);
+        alert("Erreur: " + error.message);
     } else {
-      alert("Mot de passe mis à jour avec succès !");
-      router.push("/auth/login");
+        alert("Mot de passe mis à jour avec succès !");
+        router.push("/auth/login");
     }
-  };
+    };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "#F8F9FA" }}>
