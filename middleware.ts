@@ -29,19 +29,29 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Routes protégées (dashboard)
-  if (request.nextUrl.pathname.startsWith('/dashboard') && user) {
+  // Vérifier si le compte est actif (pour toutes les routes protégées)
+  if (user) {
     const { data: userMeta } = await supabase
       .from('users_metadata')
-      .select('role')
+      .select('role, is_active')
       .eq('id', user.id)
       .single();
     
-    // Les membres n'ont pas accès au dashboard
-    if (userMeta?.role === 'membre') {
-      return NextResponse.redirect(new URL('/mon-profil', request.url));
+    // Si le compte n'est pas actif, déconnecter et rediriger
+    if (userMeta && !userMeta.is_active) {
+      await supabase.auth.signOut();
+      return NextResponse.redirect(new URL('/auth/login?error=account_inactive', request.url));
     }
-    // admin et secretaire peuvent accéder
+    
+    const role = userMeta?.role;
+    
+    // Routes protégées (dashboard)
+    if (request.nextUrl.pathname.startsWith('/dashboard')) {
+      // Les membres n'ont pas accès au dashboard
+      if (role === 'membre') {
+        return NextResponse.redirect(new URL('/mon-profil', request.url));
+      }
+    }
   }
 
   // Route login : si déjà connecté, redirige vers dashboard
