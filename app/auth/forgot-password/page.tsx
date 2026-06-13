@@ -60,7 +60,7 @@ export default function ForgotPasswordPage() {
               Vérifiez votre boîte de réception (et vos spams).
             </CardDescription>
             <Link href="/auth/login">
-              <Button className="w-full" style={{ backgroundColor: "#007A2F" }}>
+              <Button className="w-full" style={{ backgroundColor: "#007A2F", color: "white" }}>
                 Retour à la connexion
               </Button>
             </Link>
