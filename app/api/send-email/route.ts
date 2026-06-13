@@ -1,30 +1,36 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
 
-// Forcer le mode dynamique (pas de build statique)
-export const dynamic = 'force-dynamic';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM_EMAIL = process.env.FROM_EMAIL || 'onboarding@resend.dev';
+// Vérifier si on est en mode build
+const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build';
 
 export async function POST(request: Request) {
-  try {
-    const { to, subject, message } = await request.json();
-    
-    const { data, error } = await resend.emails.send({
-      from: `ProLife <${FROM_EMAIL}>`,
+  // Pendant le build, retourner une réponse simulée
+  if (isBuildTime) {
+    return NextResponse.json({ success: true, message: "Build mode" });
+  }
+  
+  // En production, utiliser Resend
+  const { to, subject, message } = await request.json();
+  
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: 'ProLife <onboarding@resend.dev>',
       to: [to],
       subject,
       text: message,
-    });
-    
-    if (error) {
-      return NextResponse.json({ error }, { status: 400 });
-    }
-    
-    return NextResponse.json({ success: true, data });
-  } catch (error) {
-    console.error("Erreur envoi email:", error);
-    return NextResponse.json({ error }, { status: 500 });
+    }),
+  });
+  
+  const data = await response.json();
+  
+  if (!response.ok) {
+    return NextResponse.json({ error: data }, { status: 400 });
   }
+  
+  return NextResponse.json({ success: true, data });
 }
