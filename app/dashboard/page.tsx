@@ -51,7 +51,8 @@ export default function DashboardPage() {
     const { count: totalMembers } = await supabase
       .from('members')
       .select('*', { count: 'exact', head: true })
-      .eq('is_archived', false);
+      .eq('is_archived', false)
+      .eq('status', 'actif');
 
     // 2. Nouvelles adhésions
     const { count: newAdhesions } = await supabase
@@ -80,7 +81,7 @@ export default function DashboardPage() {
       .from('members')
       .select('id, first_name, last_name, birth_date')
       .eq('is_archived', false)
-      .not('birth_date', 'is', null);
+      .eq('status', 'actif');
 
     const birthdays = birthdayData?.filter(member => {
       const birthDate = new Date(member.birth_date);
@@ -100,7 +101,8 @@ export default function DashboardPage() {
     const { data: membersByMonth } = await supabase
       .from('members')
       .select('admission_date')
-      .eq('is_archived', false);
+      .eq('is_archived', false)
+      .eq('status', 'actif');
 
     const months: { [key: string]: number } = {};
     membersByMonth?.forEach(m => {
@@ -113,7 +115,8 @@ export default function DashboardPage() {
     const { data: genderStats } = await supabase
       .from('members')
       .select('gender')
-      .eq('is_archived', false);
+      .eq('is_archived', false)
+      .eq('status', 'actif'); 
 
     const maleCount = genderStats?.filter(m => m.gender === 'M').length || 0;
     const femaleCount = genderStats?.filter(m => m.gender === 'F').length || 0;
@@ -128,7 +131,8 @@ export default function DashboardPage() {
     const { data: byYear } = await supabase
       .from('members')
       .select('admission_date')
-      .eq('is_archived', false);
+      .eq('is_archived', false)
+      .eq('status', 'actif'); 
 
     const years: { [key: string]: number } = {};
     byYear?.forEach(m => {
