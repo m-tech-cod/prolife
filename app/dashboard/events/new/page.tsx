@@ -136,7 +136,7 @@ export default function NewEventPage() {
               <Button 
                 type="submit" 
                 className="w-full" 
-                style={{ backgroundColor: "#007A2F" }} 
+                style={{ backgroundColor: "#007A2F", color: "white"}} 
                 disabled={loading}
               >
                 {loading ? "Création en cours..." : "Créer l'événement"}

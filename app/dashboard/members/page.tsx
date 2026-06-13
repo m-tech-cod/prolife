@@ -59,12 +59,13 @@ export default function MembersPage() {
   }, [currentPage, searchTerm, selectedMonth]);
 
   const fetchMembers = async () => {
-    setLoading(true);
-    let query = supabase
-      .from('members')
-      .select('id, member_number, first_name, last_name, email, phone, birth_date, status, admission_date', { count: 'exact' })
-      .eq('is_archived', false);
-
+  setLoading(true);
+  let query = supabase
+    .from('members')
+    .select('id, member_number, first_name, last_name, email, phone, birth_date, status, admission_date', { count: 'exact' })
+    .eq('is_archived', false)
+    .eq('status', 'actif');
+    
     // Filtre par recherche
     if (searchTerm) {
       query = query.or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,member_number.ilike.%${searchTerm}%`);
