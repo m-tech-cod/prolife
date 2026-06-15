@@ -156,6 +156,7 @@ export default function HomePage() {
       <footer style={{ backgroundColor: "#005A23" }} className="text-white py-8 text-center">
         <p className="text-sm">© 2026 Communauté ProLife - Tous droits réservés</p>
         <p className="text-xs mt-2 text-white/60">&quot;Nous sommes pour la vie&quot;</p>
+        <p className="text-xs mt-4 text-white/40">Conçu et développé par NovaWeb Labs</p>
       </footer>
 
       {/* Animations CSS */}
