@@ -1,42 +1,36 @@
-# Communauté ProLife
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-Plateforme web de gestion des membres pour la communauté ProLife.
+## Getting Started
 
-## Technologies
+First, run the development server:
 
-- **Frontend** : Next.js 14, TypeScript, Tailwind CSS, Shadcn UI
-- **Backend** : Supabase (Auth, PostgreSQL, Storage)
-- **Déploiement** : Vercel
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-## Fonctionnalités
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-- Authentification (connexion / inscription)
-- Gestion des adhésions (validation/rejet)
-- Gestion des membres (CRUD + photo)
-- Archives des anciens membres
-- Gestion des événements
-- Exports PDF et Excel
-- Tableau de bord avec statistiques
-- Notifications par email
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-##  Rôles
+This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-Rôle	Accès
-Admin	Accès total
-Secrétaire	Accès total
-Membre	Profil uniquement
+## Learn More
 
-## Emails de notification
-Notification aux admins pour nouvelle adhésion
+To learn more about Next.js, take a look at the following resources:
 
-Confirmation au membre après validation/rejet
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-## Palette de couleurs
-Vert principal : #007A2F
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-Rouge : #9F2723
+## Deploy on Vercel
 
-Jaune : #F2BE2E
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-## Licence
-© 2026 Communauté ProLife  - Tous droits réservés
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
