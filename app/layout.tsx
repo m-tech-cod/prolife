@@ -8,9 +8,9 @@ export const metadata: Metadata = {
   title: "ProLife - Nous sommes pour la vie",
   description: "Plateforme de gestion des membres de la communauté ProLife.",
   icons: {
-    icon: "/images/logo.jpeg",
-    shortcut: "/images/logo.jpeg",
-    apple: "/images/logo.jpeg",
+    icon: "/images/logo.webp",
+    shortcut: "/images/logo.webp",
+    apple: "/images/logo.webp",
   },
   openGraph: {
     title: "ProLife",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     siteName: "ProLife Community",
     images: [
       {
-        url: "/images/logo.jpeg",
+        url: "/images/logo.webp",
         width: 800,
         height: 600,
         alt: "ProLife Community Logo",

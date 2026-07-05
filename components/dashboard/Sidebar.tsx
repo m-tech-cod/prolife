@@ -52,7 +52,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="p-6 border-b" style={{ backgroundColor: "#007A2F" }}>
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg animate-pulse">
-              <img src="/images/logo.jpeg" alt="ProLife" className="w-8 h-8 object-contain" />
+              <img src="/images/logo.webp" alt="ProLife" className="w-8 h-8 object-contain" />
             </div>
             <div>
               <h1 className="text-white font-bold text-lg">ProLife</h1>

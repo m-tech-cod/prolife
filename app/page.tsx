@@ -62,7 +62,7 @@ export default function HomePage() {
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ 
-            backgroundImage: "url('/images/hero.jpeg')",
+            backgroundImage: "url('/images/hero.webp')",
             backgroundPosition: "center 30%",
           }}
         />
@@ -73,7 +73,7 @@ export default function HomePage() {
         {/* Logo en haut à gauche */}
         <div className="absolute top-6 left-6 z-20 animate-slideInLeft">
           <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl hover:scale-105 transition-transform duration-300">
-            <Image src="/images/logo.jpeg" alt="ProLife" width={64} height={64} className="rounded-full" />
+            <Image src="/images/logo.webp" alt="ProLife" width={64} height={64} className="rounded-full" />
           </div>
         </div>
 
@@ -156,7 +156,7 @@ export default function HomePage() {
       <footer style={{ backgroundColor: "#005A23" }} className="text-white py-8 text-center">
         <p className="text-sm">© 2026 Communauté ProLife - Tous droits réservés</p>
         <p className="text-xs mt-2 text-white/60">&quot;Nous sommes pour la vie&quot;</p>
-        <p className="text-xs mt-4 text-white/40">Conçu et développé par Araffath Tech</p>
+        <p className="text-xs mt-4 text-white/40">Conçu et développé par ALAYDE TECH & Jeanno Dev</p>
       </footer>
 
       {/* Animations CSS */}
